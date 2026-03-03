@@ -1,6 +1,0 @@
-#ifndef POKEPLATINUM_FIELD_SYSTEM_DECL_H
-#define POKEPLATINUM_FIELD_SYSTEM_DECL_H
-
-typedef struct FieldSystem_t FieldSystem;
-
-#endif // POKEPLATINUM_FIELD_SYSTEM_DECL_H

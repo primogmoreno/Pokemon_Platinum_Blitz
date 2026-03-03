@@ -1,6 +1,0 @@
-# Do not format any .s or .inc file
-*.s
-*.inc
-
-# Do not format tools
-tools/*

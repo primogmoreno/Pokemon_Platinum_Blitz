@@ -1,1 +1,0 @@
-subdir('zkn_data')

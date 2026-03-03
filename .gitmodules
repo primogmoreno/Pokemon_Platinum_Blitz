@@ -1,0 +1,3 @@
+[submodule "pokeplatinum"]
+	path = pokeplatinum
+	url = git@github.com:primogmoreno/pokeplatinum.git

@@ -1,124 +1,31 @@
-# Build directory
-/build/
-
-# Metroskrew artifacts
-/metroskrew-*.tar.xz
-/metroskrew-*.7z
-
-# Subproject folders
-/subprojects/libvct-*/
-/subprojects/NitroDWC-*/
-/subprojects/NitroSDK-*/
-/subprojects/NitroSystem-*/
-/subprojects/NitroWiFi-*/
-/subprojects/nitrogfx/
-/subprojects/libpng-*/
-/subprojects/zlib-*/
-/subprojects/packagecache
-/subprojects/SDATTool/
-/subprojects/metang/
-/subprojects/rapidjson-*/
-/subprojects/meson-*/
-/subprojects/nitrorom/
-/subprojects/metroskrew/
-/subprojects/.wraplock
-
-# Legacy mwrap compiler
-/tools/cw/mwrap
-
-# CLion folders
-.idea/
-cmake-build-debug/
-
-# Generated files
-*.4bpp
-*.lz
-*.gbapal
-
-# For asmdiff
-*/baserom.*
-*.dump
-
-# For decomp.me
-ctx.c
-
-# Working files
-overlays/*/module_*.s
-overlays/*/module_*.sbin
-overlays/*/module_*.cfg
-
-*.bnr
-*.nbfp
-*.nbfc
-
-# Dism scripts
-dism.sh
-asmdiff.sh
-
-# Symbols CSV
-symbols.csv
-
-# NARCs
-res/**/*.c
-*.o
-
-# SDAT Files
-res/sound/*.sdat
-res/sound/*/Files/BANK/*.sbnk
-res/sound/*/Files/SEQ/*.sseq
-res/sound/*/Files/WAVARC/*.swar
-
-# Utilities
-ntruncompbw
-*.elf
-cmake-build-*
-*.sbin_LZ
-*.diff
-
-*.dSYM
-
-# MacOS garbage
-.DS_Store
-
-# Depfiles
-*.d
-
-diff.txt
-
-.vs/
-.vscode/*
-!.vscode/launch.json
-
-temp_asm/
-asm_old/
-
-!platinum.us/banner.bnr
-
-uncrustify.cfg
-compare.sh
-diff/
-
-sdk/
-
-!tools/asmdiff/asmdiff.sh
-
-__pycache__
-.cache
-.venv/
-.python-version
-
-compile_commands.json
-
-# Save files
-*.dsv
+# Base ROM (never commit — must be user-provided)
+*.nds
 *.sav
+*.dsv
 
-# Savestate files
-*.ds[0-9]
-*.dst
-*.ml[0-9]
-*.mln
+# Patch output (generated; committed only when releasing)
+patches/*.xdelta
 
-# Cheat files
-*.dct
-*.mch
+# Editor/OS artifacts
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# VS Code
+.vscode/
+
+# Claude Code settings (not project source)
+.claude/
+
+# Windows Zone.Identifier metadata files
+*:Zone.Identifier
+
+# Base ROM path if kept in repo directory
+platinum_rom.nds
+platinum.nds

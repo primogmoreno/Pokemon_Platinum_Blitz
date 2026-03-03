@@ -1,6 +1,0 @@
-#ifndef POKEPLATINUM_ERROR_MESSAGE_RESET_H
-#define POKEPLATINUM_ERROR_MESSAGE_RESET_H
-
-void ErrorMessageReset_PrintErrorAndReset(void);
-
-#endif // POKEPLATINUM_ERROR_MESSAGE_RESET_H

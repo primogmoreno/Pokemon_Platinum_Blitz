@@ -1,299 +1,256 @@
-# Installation Instructions
+# Pokemon Platinum Blitz — Build Setup
 
-This document details the steps necessary to build a copy of Pokémon Platinum
-(EN-US) using this repository.
+## Overview
 
-## Table of Contents
+This project forks `pret/pokeplatinum`, the byte-for-byte decompilation of Pokemon Platinum. Changes are made in version-controlled C source and data files, compiled with the Metrowerks toolchain under WSL2, and distributed as an `.xdelta` patch.
 
-- [1. Setting Up Your Development Environment](#1-setting-up-your-development-environment)
-  - [Windows Subsystem for Linux](#windows-subsystem-for-linux)
-    - [New Installs](#new-installs)
-    - [Existing Installs](#existing-installs)
-    - [Install Build Dependencies](#install-build-dependencies)
-  - [Windows with MSYS2](#windows-with-msys2)
-  - [MacOS](#macos)
-  - [Linux](#linux)
-    - [Ubuntu (and other Debian derivatives)](#ubuntu-and-other-debian-derivatives)
-    - [Arch Linux (and derivatives)](#arch-linux-and-derivatives)
-    - [Fedora (and derivatives)](#fedora-and-derivatives)
-  - [Docker](#docker)
-- [2. Downloading the Repository](#2-downloading-the-repository)
-- [3. Building the Repository](#3-building-the-repository)
-- [4. Debugger Support](#4-debugger-support)
-- [Troubleshooting FAQ](#troubleshooting-faq)
-  - [My Build is Failing After Merging from Main](#my-build-is-failing-after-merging-from-main)
+---
 
-## 1. Setting Up Your Development Environment
+## IMPORTANT: Project Must Live in WSL2's Native Filesystem
 
-### Windows Subsystem for Linux
+The build toolchain (Meson, mwccarm, arm-none-eabi) **must run inside WSL2** and the project **must be in WSL2's native Linux filesystem** — NOT in a Windows path like `C:\Users\...`. Accessing Windows drives from WSL2 via `/mnt/c/...` is 10–20x slower and causes file-permission errors with the build tools.
 
-> [!IMPORTANT]
-> If you intend to store your project on the Windows file system (or do not know
-> what that means), then use these instructions, which will guide you through
-> installing WSL version 1. If you intend to use WSL version 2, then instead
-> follow the instructions for [Linux](#linux).
+| What | Where |
+|---|---|
+| Project source code | `~/Pokemon_Platinum_Blitz/` (WSL2 Ubuntu) |
+| Base ROM | `~/platinum.nds` (WSL2, outside the repo) |
+| mwccarm + NitroSDK | `~/mwccarm/` and `~/NitroSDK/` (WSL2, outside the repo) |
+| File editing from Windows | VS Code Remote-WSL extension — see Step 5 below |
+| View files in Windows Explorer | `\\wsl$\Ubuntu\home\<username>\Pokemon_Platinum_Blitz` |
 
-#### New Installs
+---
 
-Follow these instructions if you do not have an existing install of WSL.
+## Step 1 — Enable WSL2 and Install Ubuntu
 
-1. Open [Windows PowerShell as Administrator](https://i.imgur.com/QKmVbP9.png).
-Paste (Right Click or Shift+Insert) the following command:
+WSL2 is already installed on this machine. To verify:
+```powershell
+# In Windows PowerShell:
+wsl --list --verbose
+```
+You should see an Ubuntu distribution at VERSION 2. If not, run:
+```powershell
+wsl --install
+```
+and restart.
 
-    ```powershell
-    wsl --install -d Ubuntu
-    ```
+---
 
-2. Once the process finishes, you will be prompted to restart your machine.
-Accept.
+## Step 2 — Configure Git in WSL2
 
-3. After rebooting, reopen PowerShell and run the following command to downgrade
-WSL to version 1:
-
-    ```powershell
-    wsl --set-version Ubuntu 1
-    ```
-
-    WSL version 1 is preferred for most WSL users due to its increased performance
-when accessing files in the Windows file system.
-
-4. Open `Ubuntu` from your Start menu.
-
-5. `Ubuntu` will set up its own installation when it runs for the first time. Once
-finished, it will ask for a username and password as input.
-
-    > [!NOTE]
-    > When typing the password, there will be no visible response; this is normal,
-    > and the terminal is still reading your input.
-
-6. Update `Ubuntu`'s package registry:
-
-    ```bash
-    sudo apt update && sudo apt upgrade
-    ```
-
-7. [`Install build dependencies`](#install-build-dependencies).
-
-#### Existing Installs
-
-Follow these instructions if you have an existing install of WSL, specifically
-`Ubuntu`.
-
-Older versions of `Ubuntu` (e.g., `20.04`) ship with an outdated version of
-Python, which is not supported. To remedy this, you can upgrade your existing
-install to a more recent version of `Ubuntu`:
-
-1. Run the following inside `Ubuntu`:
-
-    ```bash
-    sudo apt upgrade && sudo apt full-upgrade
-    ```
-
-2. Open PowerShell and run the following commands to restart `Ubuntu`:
-
-    ```powershell
-    wsl -t Ubuntu
-    wsl -d Ubuntu
-    ```
-
-3. Re-open `Ubuntu` and run the following to start a system upgrade:
-
-    ```bash
-    sudo do-release-upgrade
-    ```
-
-    This process may take a long time.
-
-4. Once `Ubuntu` is done upgrading, update `Ubuntu`'s package registry:
-
-    ```bash
-    sudo apt update && sudo apt upgrade
-    ```
-
-5. [`Install build dependencies`](#install-build-dependencies).
-
-#### Install Build Dependencies
-
-1. Run the following to install build dependencies from the `Ubuntu` package
-registry:
-
-    ```bash
-    sudo apt install bison flex g++ gcc-arm-none-eabi git lib32zl make ninja-build pkg-config python3 p7zip
-    ```
-
-2. [Download the repository](#2-downloading-the-repository).
-
-### Windows with MSYS2
-
-If you are unable to run Windows Subsystem for Linux due to performance reasons
-or lacking virtualization requirements, then MSYS2 may be an option for you.
-
-1. Download the MSYS2 installer from [the official website](https://www.msys2.org/)
-and install it on your system.
-
-2. Once the installation is complete, a terminal should automatically pop up.
-To update your package registry, enter the following command:
-
-    ```bash
-    pacman -Syu
-    ```
-
-    Press 'Y' when prompted to confirm the update. This process may take a few
-minutes. Once completed, the terminal will automatically close.
-
-3. Re-open an MSYS terminal (the pink icon) from your Start Menu, then enter
-the following commands to install necessary build dependencies:
-
-    ```bash
-    echo 'export PATH=${PATH}:/mingw64/bin' >> ~/.bashrc
-    source ~/.bashrc
-    pacman -S bison flex gcc git make ninja python mingw-w64-x86_64-arm-none-eabi-gcc p7zip
-    ```
-
-    Press 'Y' when prompted to confirm the installation.
-
-4. [Download the repository](#2-downloading-the-repository).
-
-### MacOS
-
-1. Apple bundles a number of the requisite utilities into Xcode Command Line Tools;
-to install these, run:
-
-    ```zsh
-    xcode-select --install
-    ```
-
-2. Install [Homebrew](https://brew.sh/).
-
-3. Run the following commands to install additional dependencies:
-
-    ```zsh
-    brew update
-    brew install gcc@14 ninja libpng pkg-config arm-none-eabi-gcc xz
-    brew install --cask wine-stable
-    ```
-
-4. You may need to authorize the Wine installation to satisfy MacOS security
-requirements. To do this, open the Applications folder in Finder and locate the
-Wine Stable application. Control-Click on this icon to open the context menu,
-then Control-Click on Open and grant the requested permissions.
-
-5. If your MacOS installation is Monterey (12) or earlier, then you may also need
-GNU `coreutils` installed to run the build scripts:
-
-    ```zsh
-    brew install coreutils
-    ```
-
-6. [Download the repository](#2-downloading-the-repository).
-
-### Linux
-
-> [!NOTE]
-> Precise packages to be installed will vary by Linux distribution and
-> package registry. A handful of common distributions are listed below for
-> convenience.
-
-Once you have installed all of the listed dependencies, proceed to [downloading
-the repository](#2-downloading-the-repository).
-
-#### Debian (and derivatives, e.g., Ubuntu, Mint)
-
-1. Enable 32-bit installations using `dpkg`:
-
-    ```bash
-    sudo dpkg --add-architecture i386
-    ```
-
-2. Install the following packages via `apt`:
-
-    ```bash
-    sudo apt install bison flex g++ gcc-arm-none-eabi git make ninja-build pkg-config wget python3 xz-utils nasm libc6:i386
-    ```
-
-#### Arch Linux (and derivatives, e.g., Manjaro, Endeavour)
-
-1. Enable the [multilib repository](https://wiki.archlinux.org/title/Multilib).
-
-2. Install dependencies via `pacman`:
-
-    ```bash
-    sudo pacman -S arm-none-eabi-gcc bison flex gcc git make ninja python wget xz lib32-glibc
-    ```
-
-#### Fedora (and derivatives, e.g., AlmaLinux, Red Hat Enterprise Linux)
-
+Open the Ubuntu terminal app (or run `wsl` in PowerShell). Configure git identity:
 ```bash
-sudo dnf install arm-none-eabi-gcc-cs bison flex gcc-c++ git make ninja-build python3 wget2 xz glibc32
+git config --global user.name "primogmoreno"
+git config --global user.email "primogmoreno@gmail.com"
 ```
 
-## 2. Downloading the Repository
-
-From your terminal, navigate to the path in which you will store the repository.
-Users of WSL 1 should ensure that their target is on the Windows file drive.
-
+Set up SSH or personal access token for GitHub pushes from WSL2:
 ```bash
-git clone https://github.com/pret/pokeplatinum
-cd pokeplatinum
+# Generate SSH key in WSL2
+ssh-keygen -t ed25519 -C "primogmoreno@gmail.com"
+cat ~/.ssh/id_ed25519.pub
+# Copy the output and add it to GitHub: Settings → SSH and GPG keys → New SSH key
 ```
 
-## 3. Building the Repository
+---
 
-To build the ROM, run:
+## Step 3 — Clone the Project into WSL2
 
-```bash
-make
-```
-
-If everything works, then the following ROM should be built:
-
-- [build/pokeplatinum.us.nds](https://datomatic.no-intro.org/index.php?page=show_record&s=28&n=4997) `sha1: 0862ec35b24de5c7e2dcb88c9eea0873110d755c`
-
-Optionally, the repository can be configured to build a ["revision 0"
-ROM](https://datomatic.no-intro.org/index.php?page=show_record&s=28&n=3541)
-(`sha1: ce81046eda7d232513069519cb2085349896dec7`). This revision matches the
-original retail version that was shipped in North America; it contains an error
-in the GTS code where the game will not display the level range of a wanted
-Pokémon. This error was patched as part of a second shipment of cartridges for
-the North American release; it is not present in any other localization.
-
-To build this revision, instead of the above command, run the following:
+All work happens at `~/Pokemon_Platinum_Blitz` inside WSL2.
 
 ```bash
-ROM_REVISION=0 make
+# In WSL2 terminal:
+cd ~
+git clone git@github.com:primogmoreno/Pokemon_Platinum_Blitz.git
+cd Pokemon_Platinum_Blitz
+git submodule update --init pokeplatinum
 ```
 
-If you need further assistance, feel free to ask a question in the `#pokeplatinum`
-channel of the `pret` Discord (see `README.md` for contact information) or [open
-an issue](https://github.com/pret/pokeplatinum/issues/new).
+This clones the wrapper repo and initializes the `pokeplatinum/` submodule (the full pret/pokeplatinum decompilation source).
 
-## 4. Debugger Support
+---
 
-This step is optional, but useful. `pokeplatinum` ships with support for GDB
-debugging and a target to build a debug-enabled ROM:
+## Step 4 — Install Build Dependencies in WSL2
 
 ```bash
-make debug
+sudo apt update && sudo apt install -y \
+    build-essential \
+    git \
+    python3 python3-pip \
+    perl \
+    ninja-build \
+    pkg-config \
+    libpng-dev \
+    p7zip-full \
+    xdelta3
 ```
 
-For convenience, a template `launch.json` configuration for VS Code is provided
-in the `.vscode` folder of the repository.
+Install Meson 1.5+ (the apt package may be too old):
+```bash
+pip3 install --user meson
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+meson --version   # should print 1.5.x or higher
+```
 
-Due to the nature of the Nintendo DS, use of standard builds of GDB for debugging
-is insufficient. A fork of `binutils-gdb` which supports the overlay system
-employed by the console is available [here](https://github.com/joshua-smith-12/binutils-gdb-nds).
+Install devkitARM (arm-none-eabi toolchain):
+```bash
+wget https://apt.devkitpro.org/install-devkitpro-pacman
+chmod +x ./install-devkitpro-pacman
+sudo ./install-devkitpro-pacman
+sudo dkp-pacman -S devkitARM
+```
 
-For installation instructions, refer to [the `README.md`](https://github.com/joshua-smith-12/binutils-gdb-nds/blob/master/README.md).
+Add devkitARM to PATH:
+```bash
+echo 'export DEVKITPRO=/opt/devkitpro' >> ~/.bashrc
+echo 'export DEVKITARM=/opt/devkitpro/devkitARM' >> ~/.bashrc
+echo 'export PATH=$DEVKITARM/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+arm-none-eabi-gcc --version   # verify
+```
 
-## Troubleshooting FAQ
+---
 
-### My Build is Failing After Merging from Main
+## Step 5 — Install VS Code Remote-WSL (for editing from Windows)
 
-It is likely that your subprojects are out of date; update them with the following
-command:
+In Windows, install the **Remote - WSL** extension for VS Code:
+- Open VS Code → Extensions → search "Remote - WSL" → Install
+- Then: `code ~/Pokemon_Platinum_Blitz` from the WSL2 terminal, or click "Open a Remote Window" in VS Code
+
+This gives you full VS Code editing capabilities directly on the WSL2 filesystem, with no performance penalty.
+
+---
+
+## Step 6 — Get Proprietary Build Tools (PRET Discord)
+
+> These tools are required to build pret/pokeplatinum. They cannot be distributed.
+
+1. Join the PRET Discord: https://discord.gg/d5sBgFF
+2. Go to the `#pokediamond` channel and find the pinned messages
+3. Download:
+   - `mwccarm.zip` — Metrowerks C Compiler for ARM (required by the game's original build system)
+   - `NitroSDK-3_2-060901.7z` — Nintendo DS SDK headers and libraries
+
+Extract them into your WSL2 home directory:
+```bash
+# In WSL2 (copy the downloaded files from Windows first):
+cp /mnt/c/Users/primo/Downloads/mwccarm.zip ~/
+cp /mnt/c/Users/primo/Downloads/NitroSDK-3_2-060901.7z ~/
+
+unzip ~/mwccarm.zip -d ~/mwccarm
+7z x ~/NitroSDK-3_2-060901.7z -o$HOME/NitroSDK
+```
+
+Initialize the mwccarm license (run the Windows executable once, from Windows — not WSL2):
+```
+# In Windows: double-click mwccarm.exe to initialize license.dat
+```
+
+Then in WSL2, set the license path:
+```bash
+echo 'export LM_LICENSE_FILE="$HOME/mwccarm/license.dat"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+---
+
+## Step 7 — Verify pokeplatinum Submodule
+
+The `pokeplatinum/` submodule is pre-configured in this repository. If you ran `git submodule update --init pokeplatinum` in Step 3, it is already initialized. Verify it is present:
 
 ```bash
-make update
+ls ~/Pokemon_Platinum_Blitz/pokeplatinum/src   # should list source files
+git -C ~/Pokemon_Platinum_Blitz submodule status  # should show a commit hash
 ```
 
-And then try rebuilding.
+> **Maintainer note:** If you are setting up the repository for the first time as the project owner, you need to fork `pret/pokeplatinum` at https://github.com/pret/pokeplatinum, then add it as a submodule:
+> ```bash
+> cd ~/Pokemon_Platinum_Blitz
+> git submodule add git@github.com:primogmoreno/pokeplatinum.git pokeplatinum
+> git commit -m "Add pokeplatinum submodule"
+> git push origin main
+> ```
+
+---
+
+## Step 8 — Build pokeplatinum (Baseline Verification)
+
+```bash
+cd ~/Pokemon_Platinum_Blitz/pokeplatinum
+meson setup build \
+    --cross-file cross/arm9.ini \
+    -Dmwccarm=$HOME/mwccarm/mwccarm.exe \
+    -DNitroSDK=$HOME/NitroSDK
+meson compile -C build
+```
+
+Verify the output matches the vanilla ROM:
+```bash
+sha1sum build/platinum.nds
+# Should match the hash in pokeplatinum/rom.sha1
+```
+
+A matching SHA1 means your toolchain is set up correctly. Any Blitz modifications will change this hash — that's expected.
+
+---
+
+## Step 9 — Place the Base ROM
+
+Your base ROM must be kept **outside** the repository (it's gitignored). Copy it from Windows:
+```bash
+cp "/mnt/c/Users/primo/OneDrive/Documents/Coding Projects/Pokemon_Platinum_Blitz/platinum_rom.nds" ~/platinum.nds
+```
+
+Verify it's the correct version:
+```bash
+sha256sum ~/platinum.nds
+# Expected: fbce4c4def0c7797f8dd238a3d7a5e48b4a7e3abd86890ac65f6321cef781bdb
+```
+
+---
+
+## Creating a Distributable Patch
+
+Once changes are built, create an `.xdelta` patch against the vanilla ROM:
+```bash
+xdelta3 -e -s ~/platinum.nds ~/Pokemon_Platinum_Blitz/pokeplatinum/build/platinum.nds \
+    ~/Pokemon_Platinum_Blitz/patches/platinum_blitz_v1.0.xdelta
+```
+
+## Applying a Patch (for players)
+
+Players need a verified vanilla ROM and xdelta3:
+```bash
+# Linux/WSL2
+xdelta3 -d -s vanilla_platinum.nds platinum_blitz_v1.0.xdelta platinum_blitz.nds
+```
+
+On Windows: download the **xdelta UI** (GUI frontend) — apply the `.xdelta` patch to your vanilla ROM.
+
+---
+
+## Recommended Emulators
+
+| Emulator | Platform | Notes |
+|---|---|---|
+| MelonDS | Windows/Mac/Linux | Best accuracy, recommended for testing |
+| DeSmuME | Windows/Mac/Linux | Widely used, good compatibility |
+
+---
+
+## Troubleshooting
+
+**`meson: command not found`**
+Run `pip3 install --user meson` and ensure `~/.local/bin` is in PATH (`echo $PATH`).
+
+**`arm-none-eabi-gcc: command not found`**
+Ensure devkitARM is installed and `$DEVKITARM/bin` is in PATH. Run `source ~/.bashrc`.
+
+**mwccarm license errors**
+Run `mwccarm.exe` on Windows (not WSL2) once to initialize `license.dat`, then confirm `$LM_LICENSE_FILE` points to it.
+
+**Build is very slow / permission errors**
+You are building from `/mnt/c/...` — the Windows filesystem. Move the project to `~/Pokemon_Platinum_Blitz` (WSL2 native) and rebuild.
+
+**SHA1 mismatch on clean build**
+Use exactly the mwccarm and NitroSDK versions pinned in the PRET Discord. Different versions produce different output.
