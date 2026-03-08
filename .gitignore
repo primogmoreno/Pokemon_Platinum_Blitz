@@ -1,4 +1,4 @@
-# Base ROM (never commit — must be user-provided)
+# Nothing to see here, move along
 *.nds
 *.sav
 *.dsv
@@ -26,6 +26,6 @@ __pycache__/
 # Windows Zone.Identifier metadata files
 *:Zone.Identifier
 
-# Base ROM path if kept in repo directory
+# Nothing to see here
 platinum_rom.nds
 platinum.nds

@@ -39,14 +39,14 @@ and restart.
 
 Open the Ubuntu terminal app (or run `wsl` in PowerShell). Configure git identity:
 ```bash
-git config --global user.name "primogmoreno"
-git config --global user.email "primogmoreno@gmail.com"
+git config --global user.name "username"
+git config --global user.email "example@gmail.com"
 ```
 
 Set up SSH or personal access token for GitHub pushes from WSL2:
 ```bash
 # Generate SSH key in WSL2
-ssh-keygen -t ed25519 -C "primogmoreno@gmail.com"
+ssh-keygen -t ed25519 -C "example@gmail.com"
 cat ~/.ssh/id_ed25519.pub
 # Copy the output and add it to GitHub: Settings → SSH and GPG keys → New SSH key
 ```
@@ -60,7 +60,7 @@ All work happens at `~/Pokemon_Platinum_Blitz` inside WSL2.
 ```bash
 # In WSL2 terminal:
 cd ~
-git clone git@github.com:primogmoreno/Pokemon_Platinum_Blitz.git
+git clone git@github.com:username/Pokemon_Platinum_Blitz.git
 cd Pokemon_Platinum_Blitz
 git submodule update --init pokeplatinum
 ```
@@ -134,8 +134,8 @@ This gives you full VS Code editing capabilities directly on the WSL2 filesystem
 Extract them into your WSL2 home directory:
 ```bash
 # In WSL2 (copy the downloaded files from Windows first):
-cp /mnt/c/Users/primo/Downloads/mwccarm.zip ~/
-cp /mnt/c/Users/primo/Downloads/NitroSDK-3_2-060901.7z ~/
+cp /mnt/c/Users/user/Downloads/mwccarm.zip ~/
+cp /mnt/c/Users/user/Downloads/NitroSDK-3_2-060901.7z ~/
 
 unzip ~/mwccarm.zip -d ~/mwccarm
 7z x ~/NitroSDK-3_2-060901.7z -o$HOME/NitroSDK
@@ -166,7 +166,7 @@ git -C ~/Pokemon_Platinum_Blitz submodule status  # should show a commit hash
 > **Maintainer note:** If you are setting up the repository for the first time as the project owner, you need to fork `pret/pokeplatinum` at https://github.com/pret/pokeplatinum, then add it as a submodule:
 > ```bash
 > cd ~/Pokemon_Platinum_Blitz
-> git submodule add git@github.com:primogmoreno/pokeplatinum.git pokeplatinum
+> git submodule add git@github.com:example@gmail.com/pokeplatinum.git pokeplatinum
 > git commit -m "Add pokeplatinum submodule"
 > git push origin main
 > ```
@@ -198,7 +198,7 @@ A matching SHA1 means your toolchain is set up correctly. Any Blitz modification
 
 Your base ROM must be kept **outside** the repository (it's gitignored). Copy it from Windows:
 ```bash
-cp "/mnt/c/Users/primo/OneDrive/Documents/Coding Projects/Pokemon_Platinum_Blitz/platinum_rom.nds" ~/platinum.nds
+cp "/mnt/c/Users/user/OneDrive/Documents/Coding Projects/Pokemon_Platinum_Blitz/platinum_rom.nds" ~/platinum.nds
 ```
 
 Verify it's the correct version:
