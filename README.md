@@ -4,6 +4,10 @@ A ROM hack of Pokemon Platinum designed for **draft-auction nuzlocke races**, mo
 
 ---
 
+## Credits
+Frankly Nathan for inspiring this idea to be done in Pokemon Platinum
+https://eeveeexpo.com/resources/1101/ - For compling pixel sprites available for ROM Hack use
+
 ## Features (v1.0)
 
 ### Enhanced Boss Battles
